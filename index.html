@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TERRITOUR — 관광지 수집·점령 게임</title>
+  <meta name="description" content="전국 관광지를 발견하고, 마그넷으로 수집하고, 팀과 함께 영토를 넓혀가는 여행 게임 앱" />
+  <meta property="og:title" content="TERRITOUR" />
+  <meta property="og:description" content="전국이 탐험판이 돼요. 관광지를 발견하고 마그넷으로 수집하는 여행 게임" />
+  <meta property="og:image" content="images/brand/app_logo.png" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream: #faf6ee;
+      --navy: #1a2744;
+      --red: #d93b3b;
+      --blue: #3b6ed9;
+      --cork: #c9a96e;
+      --text: #2c2c2c;
+      --text-light: #666;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      background: var(--cream);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      background: rgba(250, 246, 238, 0.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(201, 169, 110, 0.3);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 5vw;
+      height: 60px;
+      z-index: 100;
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 1.1rem; font-weight: 700; letter-spacing: 0.04em;
+      color: var(--navy); text-decoration: none;
+    }
+    .nav-logo img { width: 32px; height: 32px; border-radius: 8px; }
+    .nav-cta {
+      background: var(--navy); color: #fff;
+      padding: 8px 18px; border-radius: 20px;
+      font-size: 0.85rem; font-weight: 600;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .nav-cta:hover { background: var(--blue); }
+
+    .hero {
+      padding: 120px 5vw 80px;
+      display: flex; align-items: center; justify-content: center;
+      gap: 60px;
+      max-width: 1100px; margin: 0 auto;
+      flex-wrap: wrap;
+    }
+    .hero-text { flex: 1; min-width: 280px; }
+    .hero-badge {
+      display: inline-block;
+      background: var(--red); color: #fff;
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em;
+      padding: 4px 10px; border-radius: 4px;
+      margin-bottom: 16px;
+    }
+    .hero-title {
+      font-size: clamp(2rem, 5vw, 3.4rem);
+      font-weight: 800; line-height: 1.2;
+      color: var(--navy);
+      margin-bottom: 20px;
+    }
+    .hero-title span { color: var(--red); }
+    .hero-sub {
+      font-size: 1.05rem; line-height: 1.7;
+      color: var(--text-light);
+      margin-bottom: 36px;
+      max-width: 420px;
+    }
+    .hero-buttons { display: flex; gap: 12px; flex-wrap: wrap; }
+    .btn-primary {
+      background: var(--navy); color: #fff;
+      padding: 14px 28px; border-radius: 12px;
+      font-size: 1rem; font-weight: 700;
+      text-decoration: none;
+      display: flex; align-items: center; gap: 8px;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 4px 14px rgba(26, 39, 68, 0.2);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(26, 39, 68, 0.3); }
+    .btn-secondary {
+      background: transparent; color: var(--navy);
+      padding: 14px 28px; border-radius: 12px;
+      font-size: 1rem; font-weight: 600;
+      text-decoration: none;
+      border: 2px solid var(--navy);
+      transition: background 0.15s;
+    }
+    .btn-secondary:hover { background: rgba(26, 39, 68, 0.06); }
+
+    .hero-phone { position: relative; flex-shrink: 0; }
+    .hero-phone img {
+      width: 240px;
+      border-radius: 32px;
+      box-shadow: 0 20px 60px rgba(26, 39, 68, 0.18);
+    }
+    .deco-sticker {
+      position: absolute;
+      font-size: 2rem;
+      animation: float 3s ease-in-out infinite;
+    }
+    .deco-sticker:nth-child(2) { top: -20px; right: -24px; animation-delay: 0.5s; }
+    .deco-sticker:nth-child(3) { bottom: 40px; left: -28px; animation-delay: 1s; }
+    .deco-sticker:nth-child(4) { bottom: -16px; right: 20px; animation-delay: 1.5s; }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .section {
+      padding: 80px 5vw;
+      max-width: 1100px; margin: 0 auto;
+    }
+    .section-label {
+      font-size: 0.78rem; font-weight: 700; letter-spacing: 0.1em;
+      color: var(--cork); text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .section-title {
+      font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+      font-weight: 800; color: var(--navy);
+      line-height: 1.3; margin-bottom: 16px;
+    }
+    .section-sub {
+      font-size: 1rem; color: var(--text-light);
+      line-height: 1.7; max-width: 520px;
+      margin-bottom: 56px;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 24px;
+    }
+    .feature-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 28px 24px;
+      border: 1.5px solid rgba(201, 169, 110, 0.2);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .feature-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+    .feature-icon { font-size: 2rem; margin-bottom: 14px; }
+    .feature-card h3 { font-size: 1.05rem; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
+    .feature-card p { font-size: 0.9rem; color: var(--text-light); line-height: 1.6; }
+
+    .screenshots-section {
+      background: var(--navy);
+      padding: 80px 0;
+      overflow: hidden;
+    }
+    .screenshots-inner {
+      max-width: 1100px; margin: 0 auto;
+      padding: 0 5vw;
+    }
+    .screenshots-inner .section-label { color: rgba(255,255,255,0.5); }
+    .screenshots-inner .section-title { color: #fff; }
+    .screenshots-inner .section-sub { color: rgba(255,255,255,0.6); }
+    .screenshots-scroll {
+      display: flex; gap: 20px;
+      overflow-x: auto;
+      padding: 8px 5vw 24px;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .screenshots-scroll::-webkit-scrollbar { display: none; }
+    .screenshot-item { flex-shrink: 0; scroll-snap-align: start; }
+    .screenshot-item img {
+      width: 200px;
+      border-radius: 24px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      display: block;
+    }
+    .screenshot-item p {
+      color: rgba(255,255,255,0.5);
+      font-size: 0.75rem;
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    .steps { display: flex; gap: 32px; flex-wrap: wrap; }
+    .step { flex: 1; min-width: 200px; display: flex; gap: 16px; align-items: flex-start; }
+    .step-num {
+      width: 36px; height: 36px;
+      background: var(--red); color: #fff;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.9rem; font-weight: 700;
+      flex-shrink: 0;
+    }
+    .step-text h3 { font-size: 0.95rem; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
+    .step-text p { font-size: 0.88rem; color: var(--text-light); line-height: 1.6; }
+
+    .divider { border: none; border-top: 1.5px solid rgba(201, 169, 110, 0.25); margin: 0 5vw; }
+
+    .cta-section {
+      padding: 100px 5vw;
+      text-align: center;
+      background: linear-gradient(135deg, #1a2744 0%, #2a3d6b 100%);
+      position: relative; overflow: hidden;
+    }
+    .cta-section::before {
+      content: '🗺️';
+      position: absolute; font-size: 12rem;
+      opacity: 0.06; top: -20px; right: -40px;
+    }
+    .cta-section .section-title { color: #fff; margin-bottom: 16px; }
+    .cta-section p { color: rgba(255,255,255,0.65); font-size: 1rem; line-height: 1.7; margin-bottom: 40px; }
+    .cta-buttons { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+    .btn-light {
+      background: #fff; color: var(--navy);
+      padding: 14px 32px; border-radius: 12px;
+      font-size: 1rem; font-weight: 700;
+      text-decoration: none;
+      transition: transform 0.15s;
+    }
+    .btn-light:hover { transform: translateY(-2px); }
+    .btn-outline-light {
+      background: transparent; color: #fff;
+      padding: 14px 32px; border-radius: 12px;
+      font-size: 1rem; font-weight: 600;
+      text-decoration: none;
+      border: 2px solid rgba(255,255,255,0.4);
+      transition: border-color 0.15s;
+    }
+    .btn-outline-light:hover { border-color: #fff; }
+
+    footer {
+      background: #111827;
+      color: rgba(255,255,255,0.45);
+      text-align: center;
+      padding: 32px 5vw;
+      font-size: 0.82rem;
+    }
+    footer a { color: rgba(255,255,255,0.5); text-decoration: none; }
+    footer a:hover { color: #fff; }
+
+    @media (max-width: 640px) {
+      .hero { padding: 100px 5vw 60px; flex-direction: column; text-align: center; }
+      .hero-sub { margin: 0 auto 36px; }
+      .hero-buttons { justify-content: center; }
+      .hero-phone img { width: 200px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="#">
+    <img src="images/brand/app_logo.png" alt="TERRITOUR 로고" />
+    TERRITOUR
+  </a>
+  <a class="nav-cta" href="https://apps.apple.com/app/id6807588399" target="_blank" rel="noopener">앱 다운로드</a>
+</nav>
+
+<section>
+  <div class="hero">
+    <div class="hero-text">
+      <span class="hero-badge">🧲 관광지 수집 게임</span>
+      <h1 class="hero-title">
+        전국이<br /><span>탐험판</span>이 돼요.
+      </h1>
+      <p class="hero-sub">
+        관광지를 직접 방문해 점령하고, 마그넷으로 수집하고,
+        팀과 함께 전국의 영토를 넓혀가는 여행 게임 앱.
+      </p>
+      <div class="hero-buttons">
+        <a class="btn-primary" href="https://apps.apple.com/app/id6807588399" target="_blank" rel="noopener">
+          📱 App Store
+        </a>
+        <a class="btn-secondary" href="#features">더 알아보기</a>
+      </div>
+    </div>
+    <div class="hero-phone">
+      <img src="images/screenshots/01-map.png" alt="TERRITOUR 지도 화면" loading="lazy" />
+      <span class="deco-sticker">🧲</span>
+      <span class="deco-sticker">📍</span>
+      <span class="deco-sticker">🏆</span>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="features">
+  <p class="section-label">핵심 기능</p>
+  <h2 class="section-title">여행이 게임이 된다</h2>
+  <p class="section-sub">관광지를 발견하고, 수집하고, 팀전에서 승리하는 새로운 여행 경험.</p>
+
+  <div class="feature-grid">
+    <div class="feature-card">
+      <div class="feature-icon">🗺️</div>
+      <h3>카카오 지도로 탐험</h3>
+      <p>전국 관광지가 핀으로 표시된 지도에서 내 주변의 명소를 실시간으로 발견하세요.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📍</div>
+      <h3>현장 방문으로 점령</h3>
+      <p>관광지에 직접 방문해서 점령 요청을 제출하세요. 방문 사진과 위치 인증으로 확정됩니다.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🧲</div>
+      <h3>마그넷 컬렉션</h3>
+      <p>방문한 관광지는 고유한 픽셀 마그넷으로 기록됩니다. 마그넷 보드를 채워나가는 수집의 재미.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">⚔️</div>
+      <h3>팀 점령전</h3>
+      <p>팀을 구성해 전국 영토를 함께 넓혀가세요. 리더보드에서 경쟁하며 시즌 1위를 노려보세요.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🏅</div>
+      <h3>탐험가 프로필</h3>
+      <p>내 방문 기록과 수집 현황이 탐험가 아카이브에 쌓입니다. 여행이 쌓일수록 프로필이 빛나요.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔔</div>
+      <h3>맞춤 알림</h3>
+      <p>팀 점령 소식, 시즌 이벤트 등 원하는 알림만 골라 받을 수 있습니다.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<section class="section">
+  <p class="section-label">이용 방법</p>
+  <h2 class="section-title">시작은 간단해요</h2>
+  <p class="section-sub">가입하고, 지도를 열고, 가까운 관광지를 찾아 떠나보세요.</p>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-text">
+        <h3>카카오로 로그인</h3>
+        <p>카카오 계정으로 간편하게 가입하고 팀에 합류하세요.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-text">
+        <h3>지도에서 관광지 발견</h3>
+        <p>내 주변의 관광지 핀을 탭해 정보를 확인하세요.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-text">
+        <h3>방문해서 점령</h3>
+        <p>실제로 가서 점령 요청을 제출하면 마그넷이 추가돼요.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-text">
+        <h3>팀과 함께 전국 제패</h3>
+        <p>리더보드에서 팀 순위를 확인하며 시즌을 함께 완주하세요.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="screenshots-section">
+  <div class="screenshots-inner">
+    <p class="section-label">스크린샷</p>
+    <h2 class="section-title">앱 미리보기</h2>
+    <p class="section-sub" style="margin-bottom: 36px;">직접 보고 느껴보세요.</p>
+  </div>
+  <div class="screenshots-scroll">
+    <div class="screenshot-item">
+      <img src="images/screenshots/01-map.png" alt="지도 탐험" loading="lazy" />
+      <p>지도 탐험</p>
+    </div>
+    <div class="screenshot-item">
+      <img src="images/screenshots/02-collection.png" alt="마그넷 컬렉션" loading="lazy" />
+      <p>마그넷 컬렉션</p>
+    </div>
+    <div class="screenshot-item">
+      <img src="images/screenshots/06-detail.png" alt="관광지 상세" loading="lazy" />
+      <p>관광지 상세</p>
+    </div>
+    <div class="screenshot-item">
+      <img src="images/screenshots/05-visit.png" alt="방문 점령" loading="lazy" />
+      <p>방문 점령</p>
+    </div>
+    <div class="screenshot-item">
+      <img src="images/screenshots/03-leaderboard.png" alt="팀 리더보드" loading="lazy" />
+      <p>팀 리더보드</p>
+    </div>
+    <div class="screenshot-item">
+      <img src="images/screenshots/04-profile.png" alt="탐험가 프로필" loading="lazy" />
+      <p>탐험가 프로필</p>
+    </div>
+    <div class="screenshot-item">
+      <img src="images/screenshots/06-notifications.png" alt="알림 설정" loading="lazy" />
+      <p>알림 설정</p>
+    </div>
+  </div>
+</div>
+
+<div class="cta-section">
+  <h2 class="section-title">지금 바로 탐험을 시작하세요</h2>
+  <p>여행이 게임이 되는 경험, TERRITOUR와 함께하세요.<br />전국 관광지가 당신을 기다리고 있어요.</p>
+  <div class="cta-buttons">
+    <a class="btn-light" href="https://apps.apple.com/app/id6807588399" target="_blank" rel="noopener">📱 App Store에서 받기</a>
+    <a class="btn-outline-light" href="#features">기능 살펴보기</a>
+  </div>
+</div>
+
+<footer>
+  <p>
+    © 2026 TERRITOUR
+    &nbsp;·&nbsp;
+    <a href="https://mire-yam-176.notion.site/TERRITOUR-3d09f375110980d3981be88804901df2" target="_blank" rel="noopener">개인정보처리방침</a>
+    &nbsp;·&nbsp;
+    <a href="https://mire-yam-176.notion.site/TERRITOUR-3d69f37511098053b184e58a65d28217" target="_blank" rel="noopener">고객 지원</a>
+  </p>
+</footer>
+
+</body>
+</html>
